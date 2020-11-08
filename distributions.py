@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+from scipy.stats import gamma, norm, invgamma
 
 
 class Probability_Distribution:
@@ -20,7 +21,6 @@ class Probability_Distribution:
         domain = np.linspace(x0, xn, 1000)
         y_pdf = [self.pdf(x) for x in domain]
         return plt.plot(domain, y_pdf)
-
 
 
 class Normal(Probability_Distribution):
@@ -47,6 +47,15 @@ class Normal(Probability_Distribution):
         precision = 1/self.sigma2
         return precision
 
+    def equitailed_cs(self, alpha2):
+        """
+        Calculates the equitailed credible set of a parameter.
+        The alpha to be inserted should be between (0-100).
+        """
+        alpha_split = (100-alpha2)/200
+        lower_bound = norm.ppf(alpha_split, loc=self.mu, scale=self.sigma)
+        upper_bound = norm.ppf(1-alpha_split, loc=self.mu, scale=self.sigma)
+        return (lower_bound, upper_bound)
 
 
 class Gamma(Probability_Distribution):
@@ -67,10 +76,20 @@ class Gamma(Probability_Distribution):
     def mean(self):
         mean = self.alpha/self.beta
         return mean
-    
+
     def variance(self):
         var = self.alpha/self.beta**2
         return var
+
+    def equitailed_cs(self, alpha2):
+        """
+        Calculates the equitailed credible set of a parameter.
+        The alpha to be inserted should be between (0-100).
+        """
+        alpha_split = (100-alpha2)/200
+        lower_bound = gamma.ppf(alpha_split, self.alpha, scale=1/self.beta)
+        upper_bound = gamma.ppf(1-alpha_split, self.alpha, scale=1/self.beta)
+        return (lower_bound, upper_bound)
 
 
 class Inv_Gamma(Probability_Distribution):
@@ -96,9 +115,15 @@ class Inv_Gamma(Probability_Distribution):
         var = self.beta**2/((self.alpha-1)**2*(self.alpha-2)) if self.alpha > 2 else 9999
         return var
 
-
-
-
+    def equitailed_cs(self, alpha2):
+        """
+        Calculates the equitailed credible set of a parameter.
+        The alpha to be inserted should be between (0-100).
+        """
+        alpha_split = (100-alpha2)/200
+        lower_bound = invgamma.ppf(alpha_split, self.alpha, scale=self.beta)
+        upper_bound = invgamma.ppf(1-alpha_split, self.alpha, scale=self.beta)
+        return (lower_bound, upper_bound)
 
 
 
