@@ -1,5 +1,3 @@
-import numpy as np
-
 from distributions import Normal, Gamma, Inv_Gamma
 
 
@@ -12,21 +10,23 @@ CONJUGATE_TABLE = {
               ("Poisson", "Gamma", "rate"): "poisson_gamma_rate"
               }
 
-CONJUGATES = {("Normal", "Normal"): {"Posterior": "Normal", "On": "Mu"},
-              ("Normal", "Gamma"): {"Posterior": "Gamma", "On": "Tau"},
-              ("Normal", "Inv_Gamma"): {"Posterior": "Inv_Gamma", "On": "Sigma2"},
-              ("Exponential", "Gamma"): {"Posterior": "Gamma", "On": "Lambda"},
-              ("Gamma", "Gamma"): {"Posterior": "Gamma", "On": "Beta"},
-              ("Poisson", "Gamma"): {"Posterior": "Gamma", "On": "Lambda"}
+CONJUGATES = {("Normal", "Normal"): {"Posterior": "Normal", "On": "mu"},
+              ("Normal", "Gamma"): {"Posterior": "Gamma", "On": "tau"},
+              ("Normal", "Inv_Gamma"): {"Posterior": "Inv_Gamma", "On": "sigma2"},
+              ("Exponential", "Gamma"): {"Posterior": "Gamma", "On": "lambda_"},
+              ("Gamma", "Gamma"): {"Posterior": "Gamma", "On": "beta"},
+              ("Poisson", "Gamma"): {"Posterior": "Gamma", "On": "lambda_"}
               }
 
-CONJUGATES_INV = {("Normal", "Mu"): "Normal",
-              ("Normal", "Tau"): "Gamma",
-              ("Normal", "Sigma2"): "Inv_Gamma",
-              ("Exponential", "Lambda"): "Gamma",
-              ("Gamma", "Beta"): "Gamma",
-              ("Poisson", "Lambda"): "Gamma"
+CONJUGATES_INV = {("Normal", "mu"): "Normal",
+              ("Normal", "tau"): "Gamma",
+              ("Normal", "sigma2"): "Inv_Gamma",
+              ("Exponential", "lambda_"): "Gamma",
+              ("Gamma", "beta"): "Gamma",
+              ("Poisson", "lambda_"): "Gamma"
               }
+
+assert len(CONJUGATE_TABLE)==len(CONJUGATES)==len(CONJUGATES_INV)
 
 
 def get_conjugate(likelihood, prior, parameter: str, observations: list):
@@ -35,11 +35,11 @@ def get_conjugate(likelihood, prior, parameter: str, observations: list):
     n = len(observations)
 
     if conjugate == "normal_normal_mean":
-        posterior = Normal(prior.sigma*np.sum(observations)/
-                            (likelihood.sigma/n+prior.sigma)
-                            + likelihood.sigma*prior.mu/
-                            (likelihood.sigma/n+prior.sigma),
-                            1/((1/prior.sigma)+(n/likelihood.sigma)))
+        posterior = Normal(prior.sigma2*sum(observations)/
+                            (likelihood.sigma2/n+prior.sigma2)
+                            + likelihood.sigma2*prior.mu/
+                            (likelihood.sigma2/n+prior.sigma2),
+                            1/((1/prior.sigma2)+(n/likelihood.sigma2)))
 
     elif conjugate == "normal_gamma_precision":
         posterior = Gamma(prior.alpha + n/2, prior.beta +
@@ -61,36 +61,6 @@ def get_conjugate(likelihood, prior, parameter: str, observations: list):
         posterior = Gamma(prior.alpha+sum(observations), prior.beta+n)
 
     return posterior
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

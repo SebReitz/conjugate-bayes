@@ -9,8 +9,6 @@ from scipy.special import gamma as gamma_fc
 """
 Parent class
 """
-
-
 class Probability_Distribution:
     def __init__(self, name):
         self.name = name
@@ -44,10 +42,10 @@ Child classes: Continuous Likelihood
 """
 class Normal(Probability_Distribution):
     """Initialise Normal distribution."""
-    def __init__(self, mu, sigma2):
+    def __init__(self, mu, sigma2, tau=False):
         self.name = "Normal"
         self.mu = mu
-        self.sigma2 = sigma2
+        self.sigma2 = sigma2 if not tau else 1/tau
         self.parameters = {"mu": self.mu, "sigma2": self.sigma2}
 
     def pdf(self, X):
