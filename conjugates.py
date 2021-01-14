@@ -35,16 +35,16 @@ def get_conjugate(likelihood, prior, parameter: str, observations: list):
     n = len(observations)
 
     if conjugate == "normal_normal_mean":
-        posterior = Normal(prior.sigma2*sum(observations)/
-                            (likelihood.sigma2/n+prior.sigma2)
-                            + likelihood.sigma2*prior.mu/
-                            (likelihood.sigma2/n+prior.sigma2),
-                            1/((1/prior.sigma2)+(n/likelihood.sigma2)))
+        new_mean = (1/(1/prior.sigma2 + n/likelihood.sigma2))*\
+                    (prior.mu/prior.sigma2+sum(observations)/likelihood.sigma2)
+        new_var = 1/(1/prior.sigma2+n/likelihood.sigma2)
+        posterior = Normal(new_mean, new_var)
 
     elif conjugate == "normal_gamma_precision":
-        posterior = Gamma(prior.alpha + n/2, prior.beta +
-                           sum([(observations[i]-likelihood.mu)**2
-                                for i in range(n)])/2)
+        new_alpha = prior.alpha + n/2
+        new_beta = prior.beta + sum([(observations[i]-likelihood.mu)**2
+                                for i in range(n)])/2
+        posterior = Gamma(new_alpha, new_beta)
 
     elif conjugate == "normal_inv_gamma_variance":
         posterior = Inv_Gamma(prior.alpha + n/2, prior.beta +

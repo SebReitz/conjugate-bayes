@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from scipy.stats import gamma, norm, invgamma, expon
+from scipy.stats import gamma, norm, invgamma, expon, poisson
 from scipy.special import beta as beta_fc
 from scipy.special import gamma as gamma_fc 
 
@@ -23,15 +23,25 @@ class Probability_Distribution:
         std = math.sqrt(self.variance())
         return std
 
-    def plot_pdf(self, x0, xn):
-        domain = np.linspace(x0, xn, 1000)
-        y_pdf = [self.pdf(x) for x in domain]
-        return plt.plot(domain, y_pdf)
+    def plot_pdf(self, x0, xn, pmf=False, color="blue"):     
+        if not pmf:
+            domain = np.linspace(x0, xn, 1000)
+            y_pdf = [self.pdf(x) for x in domain]
+            return plt.plot(domain, y_pdf, color=color)
+        else:
+            domain = np.linspace(x0, xn, xn-x0+1, dtype=int)
+            y_pdf = [self.pdf(x) for x in domain]
+            return plt.scatter(domain, y_pdf, color=color)
 
-    def plot_cdf(self, x0, xn):
-        domain = np.linspace(x0, xn, 1000)
-        y_cdf= [self.cdf(x) for x in domain]
-        return plt.plot(domain, y_cdf)
+    def plot_cdf(self, x0, xn, pmf=False):
+        if not pmf:
+            domain = np.linspace(x0, xn, 1000)
+            y_cdf = [self.cdf(x) for x in domain]
+            return plt.plot(domain, y_cdf)
+        else:
+            domain = np.linspace(x0, xn, xn-x0+1, dtype=int)
+            y_cdf = [self.cdf(x) for x in domain]
+            return plt.scatter(domain, y_cdf)
 
     def describe(self):
         return {"name": self.name, "parameters": self.parameters}
@@ -225,5 +235,19 @@ class Poisson(Probability_Distribution):
         self.lambda_ = lambda_
         self.parameters = {"lambda": self.lambda_}
 
+    def pdf(self, X):
+        pmf = poisson.pmf(X, self.lambda_)
+        return pmf
 
+    def cdf(self, X):
+        cdf = poisson.cdf(X, self.lambda_)
+        return cdf
+
+    def mean(self):
+        mean = self.lambda_
+        return mean
+
+    def variance(self):
+        var = self.lambda_
+        return var
 
