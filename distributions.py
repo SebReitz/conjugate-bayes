@@ -16,9 +16,6 @@ class Probability_Distribution:
         self.variance = None
         self.parameters = None
 
-    def print_stuff(self):
-        print("TEST")
-
     def std(self):
         std = math.sqrt(self.variance())
         return std
